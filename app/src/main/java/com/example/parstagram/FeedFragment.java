@@ -18,6 +18,7 @@ import com.parse.ParseException;
 import com.parse.ParseQuery;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -94,6 +95,7 @@ public class FeedFragment extends Fragment {
                     Log.i(TAG, "Post: " + post.getDescription() + ", username: " + post.getUser().getUsername());
                 }
                 posts.addAll(queryPosts);
+                Collections.reverse(posts);
                 adapter.notifyDataSetChanged();
             }
         });
@@ -119,7 +121,10 @@ public class FeedFragment extends Fragment {
                 // Your code to refresh the list here.
                 // Make sure you call swipeContainer.setRefreshing(false)
                 // once the network request has completed successfully.
-                fetchTimelineAsync(0);
+                adapter.clear();
+                queryPosts();
+                // Now we call setRefreshing(false) to signal refresh has finished
+                swipeContainer.setRefreshing(false);
             }
         });
         // Configure the refreshing colors
@@ -133,10 +138,4 @@ public class FeedFragment extends Fragment {
         return view;
     }
 
-    public void fetchTimelineAsync(int page) {
-        adapter.clear();
-        queryPosts();
-        // Now we call setRefreshing(false) to signal refresh has finished
-        swipeContainer.setRefreshing(false);
-    }
 }
