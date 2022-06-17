@@ -1,8 +1,8 @@
-# Project 3 - *Name of App Here*
+# Project 3 - Parstagram
 
-**Name of your app** is a photo sharing app using Parse as its backend.
+**Parstagram** is a photo sharing app using Parse as its backend.
 
-Time spent: **X** hours spent in total
+Time spent: **22** hours spent in total
 
 ## User Stories
 
