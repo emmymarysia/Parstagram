@@ -42,7 +42,6 @@ public class MainActivity extends AppCompatActivity {
     Fragment postFragment;
     Fragment profileFragment;
 
-    private final String TAG = "MainActivity";
     final FragmentManager fragmentManager = getSupportFragmentManager();
 
     @Override
@@ -52,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
 
         currentUser = ParseUser.getCurrentUser();
 
-        feedFragment = new FeedFragment();
+        feedFragment = new FeedFragment(this);
         postFragment = new PostFragment(this);
         profileFragment = new ProfileFragment(currentUser);
 
@@ -78,7 +77,5 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         bottomNavigationView.setSelectedItemId(R.id.action_home);
-
-        // queryPosts();
     }
 }

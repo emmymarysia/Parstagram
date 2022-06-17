@@ -59,6 +59,7 @@ public class PostDetailActivity extends AppCompatActivity {
                     .centerInside()
                     .into(ivDetailPostMedia);
         }
+
         if (profileImage != null) {
             Glide.with(this)
                     .load(profileImage.getUrl())

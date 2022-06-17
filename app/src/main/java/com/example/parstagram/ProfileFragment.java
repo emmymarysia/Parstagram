@@ -55,9 +55,7 @@ public class ProfileFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_profile, container, false);
     }
 
@@ -88,18 +86,17 @@ public class ProfileFragment extends Fragment {
                 launchCamera();
             }
         });
-
     }
 
     private void launchCamera() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        // create a file reference to access to future access
+        // create a file reference to access for future access
         photoFile = getPhotoFileUri(photoFileName);
 
         Uri fileProvider = FileProvider.getUriForFile(getContext(), "com.codepath.fileprovider", photoFile);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider);
 
-        if(intent.resolveActivity(getContext().getPackageManager()) != null) {
+        if (intent.resolveActivity(getContext().getPackageManager()) != null) {
             startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
         }
     }
@@ -111,7 +108,6 @@ public class ProfileFragment extends Fragment {
             Log.d(TAG, "failed to create directory");
         }
         File file = new File(mediaStorageDir.getPath() + File.separator + fileName);
-
         return file;
     }
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -124,7 +120,7 @@ public class ProfileFragment extends Fragment {
                 ivProfile.setImageBitmap(resizedBitmap);
                 user.put("profileImage", new ParseFile(photoFile));
                 Glide.with(this)
-                        .load(photoFile)
+                        .load(user.getParseFile("profileImage").getUrl())
                         .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
                         .circleCrop()
                         .into(ivProfile);

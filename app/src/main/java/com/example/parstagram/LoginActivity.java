@@ -62,7 +62,6 @@ import org.w3c.dom.Text;
         ParseUser.logInInBackground(username, password, new LogInCallback() {
             @Override
             public void done(ParseUser user, ParseException e) {
-                // TODO: add better error handling here
                 if (e != null) {
                     Log.e(TAG, "Issue with login", e);
                     return;

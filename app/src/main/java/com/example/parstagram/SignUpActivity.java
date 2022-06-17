@@ -20,6 +20,8 @@ public class SignUpActivity extends AppCompatActivity {
     private EditText etPasswordSignup;
     private Button btnSignup;
 
+    final String TAG = "SignUpActivity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,7 +37,6 @@ public class SignUpActivity extends AppCompatActivity {
                 ParseUser user = new ParseUser();
                 user.setUsername(etUsernameSignup.getText().toString());
                 user.setPassword(etPasswordSignup.getText().toString());
-                //TODO: add profile picture
                 user.signUpInBackground(new SignUpCallback() {
                     @Override
                     public void done(ParseException e) {
@@ -43,7 +44,7 @@ public class SignUpActivity extends AppCompatActivity {
                             Intent i = new Intent(SignUpActivity.this, MainActivity.class);
                             startActivity(i);
                         } else {
-                            Log.e("SignUpActivity", "user signup failed", e);
+                            Log.e(TAG, "user signup failed", e);
                         }
                     }
                 });

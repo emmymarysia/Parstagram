@@ -23,11 +23,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link FeedFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class FeedFragment extends Fragment {
 
     private RecyclerView rvPosts;
@@ -36,9 +31,11 @@ public class FeedFragment extends Fragment {
     PostsAdapter adapter;
     Context context;
     private SwipeRefreshLayout swipeContainer;
+    MainActivity mainActivity;
 
-    public FeedFragment() {
+    public FeedFragment(MainActivity main) {
         // Required empty public constructor
+        mainActivity = main;
     }
 
     @Override
@@ -82,7 +79,7 @@ public class FeedFragment extends Fragment {
         rvPosts = view.findViewById(R.id.rvPosts);
         posts = new ArrayList<>();
         context = getContext();
-        adapter = new PostsAdapter(context, posts);
+        adapter = new PostsAdapter(context, posts, mainActivity);
         rvPosts.setAdapter(adapter);
         rvPosts.setLayoutManager(new LinearLayoutManager(context));
 

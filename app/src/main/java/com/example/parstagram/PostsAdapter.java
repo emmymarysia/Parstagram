@@ -31,11 +31,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
     private Context context;
     private List<Post> posts;
+    MainActivity mainActivity;
 
 
-    public PostsAdapter(Context context, List<Post> posts) {
+    public PostsAdapter(Context context, List<Post> posts, MainActivity mainActivity) {
         this.context = context;
         this.posts = posts;
+        this.mainActivity = mainActivity;
     }
 
     @NonNull
@@ -92,21 +94,27 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                         .centerInside()
                         .into(ivPostMedia);
             }
+
             if (profileImage != null) {
-                //Glide.with(context).load(profileImage.getUrl()).centerInside().transform(new RoundedCorners(90)).into(ivProfileImage);
                 Glide.with(context)
                         .load(profileImage.getUrl())
                         .circleCrop()
                         .into(ivProfileImage);
             }
-        }
 
+            ivProfileImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ProfileFragment fragment = new ProfileFragment(post.getUser());
+                    mainActivity.fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
+                }
+            });
+        }
 
         @Override
         public void onClick(View v) {
-            Log.i("PostsAdapter", "clicked!!!");
             int position = getAdapterPosition();
-            if(position != RecyclerView.NO_POSITION) {
+            if (position != RecyclerView.NO_POSITION) {
                 Post post = posts.get(position);
                 Intent intent = new Intent(context, PostDetailActivity.class);
                 intent.putExtra("post", Parcels.wrap(post));
@@ -153,11 +161,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
     public void clear() {
         posts.clear();
-        notifyDataSetChanged();
-    }
-
-    public void addAll(List<Post> list) {
-        posts.addAll(list);
         notifyDataSetChanged();
     }
 }

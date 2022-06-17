@@ -44,6 +44,7 @@ public class PostFragment extends Fragment {
     private Button btnPost;
     private Button btnGallery;
     private ImageView ivPostImage;
+    private int width = 100;
     Context context;
     MainActivity mainActivity;
 
@@ -65,17 +66,10 @@ public class PostFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        /*
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        } */
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_post, container, false);
     }
 
@@ -175,8 +169,7 @@ public class PostFragment extends Fragment {
             if (resultCode == RESULT_OK) {
                 // by this point we have the camera photo on disk
                 Bitmap takenImage = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
-                // what should width be here?
-                Bitmap resizedBitmap = BitmapScaler.scaleToFitWidth(takenImage, 100);
+                Bitmap resizedBitmap = BitmapScaler.scaleToFitWidth(takenImage, width);
                 ivPostImage.setImageBitmap(resizedBitmap);
             } else {
                 Toast.makeText(context, "Picture wasn't taken!", Toast.LENGTH_SHORT).show();
@@ -189,7 +182,7 @@ public class PostFragment extends Fragment {
                 // Load the image located at photoUri into selectedImage
                 Bitmap selectedImage = loadFromUri(photoUri);
 
-                // Load the selected image into a preview
+                // Load the selected image into a preview image view
                 ivPostImage.setImageBitmap(selectedImage);
             }
         }
@@ -227,7 +220,6 @@ public class PostFragment extends Fragment {
                     Log.e(TAG, "Error while saving", e);
                     Toast.makeText(context, "Error while saving!", Toast.LENGTH_SHORT).show();
                 }
-                Log.i(TAG, "Post save was successful!");
                 etDescription.setText("");
                 ivPostImage.setImageResource(0);
                 mainActivity.feedFragment.adapter.clear();
@@ -239,8 +231,7 @@ public class PostFragment extends Fragment {
 
     public void onPickPhoto(View view) {
         // Create intent for picking a photo from the gallery
-        Intent intent = new Intent(Intent.ACTION_PICK,
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 
         // If you call startActivityForResult() using an intent that no app can handle, your app will crash.
         // So as long as the result is not null, it's safe to use the intent.
@@ -249,6 +240,4 @@ public class PostFragment extends Fragment {
             startActivityForResult(intent, PICK_PHOTO_CODE);
         }
     }
-
-
 }
