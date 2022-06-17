@@ -54,8 +54,8 @@ Here's a walkthrough of implemented user stories:
 
 GIF created with [Kap](https://getkap.co/).
 
-https://user-images.githubusercontent.com/26172675/174412261-be2d55a2-d3a7-4087-87a9-9ce3c3cd3261.mp4
 
+https://user-images.githubusercontent.com/26172675/174412636-f63a8ea5-02ed-4f8e-8c24-c3d253a39576.mp4
 
 
 ## Credits
