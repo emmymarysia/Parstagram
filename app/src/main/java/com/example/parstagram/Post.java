@@ -1,16 +1,25 @@
 package com.example.parstagram;
 
+import android.os.Bundle;
+import android.os.Parcelable;
+
 import com.parse.ParseClassName;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
+import org.parceler.Parcel;
+
+//@Parcel
 @ParseClassName("Post")
 public class Post extends ParseObject {
 
     public static final String KEY_DESCRIPTION = "description";
     public static final String KEY_IMAGE = "image";
     public static final String KEY_USER = "user";
+
+    public Post() {
+    }
 
     public String getDescription() {
         return getString(KEY_DESCRIPTION);

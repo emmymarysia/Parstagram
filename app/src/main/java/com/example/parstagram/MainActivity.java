@@ -38,20 +38,23 @@ public class MainActivity extends AppCompatActivity {
 
     private BottomNavigationView bottomNavigationView;
     ParseUser currentUser;
-
+    FeedFragment feedFragment;
+    Fragment postFragment;
+    Fragment profileFragment;
 
     private final String TAG = "MainActivity";
+    final FragmentManager fragmentManager = getSupportFragmentManager();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final FragmentManager fragmentManager = getSupportFragmentManager();
+        currentUser = ParseUser.getCurrentUser();
 
-        final Fragment feedFragment = new FeedFragment();
-        final Fragment postFragment = new PostFragment();
-        final Fragment profileFragment = new ProfileFragment();
+        feedFragment = new FeedFragment();
+        postFragment = new PostFragment(this);
+        profileFragment = new ProfileFragment(currentUser);
 
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {

@@ -6,9 +6,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.ImageDecoder;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
@@ -29,66 +32,34 @@ import com.parse.ParseFile;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link PostFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class PostFragment extends Fragment {
 
     private Button btnLogout;
     private EditText etDescription;
     private Button btnTakePhoto;
     private Button btnPost;
+    private Button btnGallery;
     private ImageView ivPostImage;
     Context context;
+    MainActivity mainActivity;
 
     private final String TAG = "PostFragment";
 
     public static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 42;
+    public final static int PICK_PHOTO_CODE = 1046;
     private File photoFile;
     public String photoFileName = "photo.jpg";
 
     ParseUser currentUser;
 
-    /*
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2; */
-
-    public PostFragment() {
+    public PostFragment(MainActivity main) {
         // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @return A new instance of fragment PostFragment.
-     */
-    /*
-    // TODO: Rename and change types and number of parameters
-    public static PostFragment newInstance(String param1, String param2) {
-        PostFragment fragment = new PostFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    } */
-
-    public static PostFragment newInstance() {
-        PostFragment fragment = new PostFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
+        mainActivity = main;
     }
 
     @Override
@@ -104,18 +75,23 @@ public class PostFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        context = getContext();
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_post, container, false);
+        return inflater.inflate(R.layout.fragment_post, container, false);
+    }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        context = getContext();
         currentUser = ParseUser.getCurrentUser();
 
         etDescription = view.findViewById(R.id.etDescription);
         btnTakePhoto = view.findViewById(R.id.btnTakePhoto);
         btnPost = view.findViewById(R.id.btnPost);
         ivPostImage = view.findViewById(R.id.ivPostImage);
-
+        btnGallery = view.findViewById(R.id.btnGallery);
         btnLogout = view.findViewById(R.id.btnLogout);
+
         btnLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -141,14 +117,19 @@ public class PostFragment extends Fragment {
             }
         });
 
+        btnGallery.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onPickPhoto(v);
+            }
+        });
+
         btnTakePhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 launchCamera();
             }
         });
-
-        return view;
     }
 
     private void onLogoutButton() {
@@ -200,14 +181,45 @@ public class PostFragment extends Fragment {
             } else {
                 Toast.makeText(context, "Picture wasn't taken!", Toast.LENGTH_SHORT).show();
             }
+        } else if ((data != null) && requestCode == PICK_PHOTO_CODE) {
+            if (resultCode == RESULT_OK) {
+                Uri photoUri = data.getData();
+                photoFile = new File(photoUri.getPath());
+
+                // Load the image located at photoUri into selectedImage
+                Bitmap selectedImage = loadFromUri(photoUri);
+
+                // Load the selected image into a preview
+                ivPostImage.setImageBitmap(selectedImage);
+            }
         }
     }
+
+    public Bitmap loadFromUri(Uri photoUri) {
+        Bitmap image = null;
+        try {
+            // check version of Android on device
+            if(Build.VERSION.SDK_INT > 27){
+                // on newer versions of Android, use the new decodeBitmap method
+                ImageDecoder.Source source = ImageDecoder.createSource(context.getContentResolver(), photoUri);
+                image = ImageDecoder.decodeBitmap(source);
+            } else {
+                // support older versions of Android by using getBitmap
+                image = MediaStore.Images.Media.getBitmap(context.getContentResolver(), photoUri);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return image;
+    }
+
 
     private void savePost(String description, ParseUser currentUserFile, File photoFile) {
         Post post = new Post();
         post.setDescription(description);
-        post.setImage(new ParseFile(photoFile));
-        post.setUser(currentUser);
+        ParseFile image = new ParseFile(photoFile);
+        post.setImage(image);
+        post.setUser(currentUserFile);
         post.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
@@ -218,7 +230,25 @@ public class PostFragment extends Fragment {
                 Log.i(TAG, "Post save was successful!");
                 etDescription.setText("");
                 ivPostImage.setImageResource(0);
+                mainActivity.feedFragment.adapter.clear();
+                mainActivity.feedFragment.queryPosts();
+                mainActivity.fragmentManager.beginTransaction().replace(R.id.flContainer, mainActivity.feedFragment).commit();
             }
         });
     }
+
+    public void onPickPhoto(View view) {
+        // Create intent for picking a photo from the gallery
+        Intent intent = new Intent(Intent.ACTION_PICK,
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
+        // If you call startActivityForResult() using an intent that no app can handle, your app will crash.
+        // So as long as the result is not null, it's safe to use the intent.
+        if (intent.resolveActivity(context.getPackageManager()) != null) {
+            // Bring up gallery to select a photo
+            startActivityForResult(intent, PICK_PHOTO_CODE);
+        }
+    }
+
+
 }

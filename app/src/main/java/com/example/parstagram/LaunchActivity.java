@@ -17,14 +17,19 @@ public class LaunchActivity extends AppCompatActivity {
 
         // app is launching
 
-        if(ParseUser.getCurrentUser() != null) {
-            // user is already logged in from last launch
-            startActivity(new Intent(this, MainActivity.class));
-            finish();
-        } else {
-            // user is not logged in
-            startActivity(new Intent(this, LoginActivity.class));
-            finish();
-        }
+
+        new Handler().postDelayed(new Runnable() {
+            public void run() {
+                if(ParseUser.getCurrentUser() != null) {
+                    // user is already logged in from last launch
+                    startActivity(new Intent(LaunchActivity.this, MainActivity.class));
+                    finish();
+                } else {
+                    // user is not logged in
+                    startActivity(new Intent(LaunchActivity.this, LoginActivity.class));
+                    finish();
+                }
+            }
+        }, 1000);
     }
 }
